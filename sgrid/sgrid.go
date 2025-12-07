@@ -17,6 +17,7 @@ func (c Coordinate[T]) Occupied() bool {
 
 type Grid2D[T any] struct {
 	coordsByX map[int][]*Coordinate[T]
+	coordsByY map[int][]*Coordinate[T]
 	Width     int
 	Height    int
 }
@@ -24,9 +25,11 @@ type Grid2D[T any] struct {
 func NewGrid2D[T any](width, height int, coords []Coordinate[T]) Grid2D[T] {
 
 	coordsByX := make(map[int][]*Coordinate[T], width)
+	coordsByY := make(map[int][]*Coordinate[T], height)
 
 	for _, c := range coords {
 		coordsByX[c.X] = append(coordsByX[c.X], &c)
+		coordsByY[c.Y] = append(coordsByY[c.Y], &c)
 	}
 
 	for _, coords := range coordsByX {
@@ -37,6 +40,7 @@ func NewGrid2D[T any](width, height int, coords []Coordinate[T]) Grid2D[T] {
 
 	return Grid2D[T]{
 		coordsByX: coordsByX,
+		coordsByY: coordsByY,
 		Width:     width,
 		Height:    height,
 	}
@@ -140,6 +144,19 @@ func (g Grid2D[T]) Coords() []*Coordinate[T] {
 		coords = append(coords, cs...)
 	}
 	return coords
+}
+
+func (g Grid2D[T]) CoordsAtX(x int) []*Coordinate[T] {
+	if _, ok := g.coordsByX[x]; ok {
+		return g.coordsByX[x]
+	}
+	return nil
+}
+func (g Grid2D[T]) CoordsAtY(y int) []*Coordinate[T] {
+	if _, ok := g.coordsByY[y]; ok {
+		return g.coordsByY[y]
+	}
+	return nil
 }
 
 func GridToBytes(g Grid2D[byte]) []byte {
